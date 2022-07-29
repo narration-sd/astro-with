@@ -14,6 +14,29 @@ export default (element) =>
 		}
 		if (client === 'only') {
 			const app = createApp({ name, render: () => h(Component, props, slots) });
+			console.log('ABOUT TO PREPARE en-suite')
+			import ('../../../src/modules/ext-vue-prepare.mjs')
+				.then (prepare => {
+					console.log ('FROM EST-VUE-PREPARE: preparing...')
+					console.log ('typeof prepare: ' + typeof prepare)
+					console.dir(prepare)
+					// console.log ('stringified prepare: ' + JSON.stringify(prepare))
+					// console.log ('prepare: ' + prepare)
+					return prepare.default (app, 'vue client')
+				})
+				.catch (err => {
+					// *todo* either this goes silent, or we always ssrequire a prepare file
+					console.error ('PREPARE IMPORT or PREPARE failed: ' + err)
+				})
+				.then (() => {
+					console.log ('CLIENTJS ABOUT TO MOUNT THIS ELEMENT')
+					app.mount(element, false);
+				})
+				.catch (err => {
+					// *todo* either this goes silent, or we always ssrequire a prepare file
+					console.error ('APP AT MOUNT failed: ' + err.message)
+					console.error ('APP AT MOUNT failed:stack: ' + err.stack)
+				})
 			app.mount(element, false);
 		} else {
 			const app = createSSRApp({ name, render: () => h(Component, props, slots) });

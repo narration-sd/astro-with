@@ -13,33 +13,34 @@ export default (element) =>
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
 		if (client === 'only') {
-			console.log('ABOUT TO CREATE app')
-			const app = createApp({ name, render: () => h(Component, props, slots) });
-			console.log('ABOUT TO PREPARE en-suite B')
 			import ('../../../src/modules/ext-vue-prepare.mjs')
 				.then (prepare => {
-					console.log ('FROM EST-VUE-PREPARE: preparing...')
-					console.log ('typeof prepare: ' + typeof prepare)
-					console.dir(prepare)
+					// console.log ('FROM EST-VUE-PREPARE: preparing...')
+					// console.log ('typeof prepare: ' + typeof prepare)
+					// console.dir(prepare);
 					// console.log ('stringified prepare: ' + JSON.stringify(prepare))
 					// console.log ('prepare: ' + prepare)
-					return prepare.default (app, 'vue-client')
+					const createArgs = { h, Component, props, slots };
+					return prepare.default (name, createArgs);
 				})
-				// .catch (err => {
-				// 	// *todo* either this goes silent, or we always require a prepare file
-				// 	console.error ('PREPARE IMPORT or PREPARE failed: ' + err)
-				// })
-				.then ((result) => {
-					console.log('PRE-MOUNT prepare result: ' + result)
-					console.log ('CLIENTJS ABOUT TO MOUNT THIS ELEMENT: result')
+				.catch (err => {
+					console.log ('CLIENTJS:prepare failed:' + err.stack)
+					throw err;
+				})
+				.then (app => {
+					console.log ('CLIENTJS ABOUT TO MOUNT PREPARE-BASED ELEMENT: ' + name)
 					app.mount(element, false);
 				})
 				.catch (err => {
-					// *todo* either this goes silent, or we always ssrequire a prepare file
-					console.error ('APP AT MOUNT failed: ' + err.message)
-					console.error ('APP AT MOUNT failed:stack: ' + err.stack)
+					// *todo* condition logging on what kind of error -- not loading, no, normal?
+					console.log('CLIENTJS:failed prepare: ' + err)
+					console.log('CLIENTJS ABOUT TO CREATE OWN app')
+					const app = createApp({ name, render: () => h(Component, props, slots) })
+					console.log ('CLIENTJS ABOUT TO MOUNT OWN ELEMENT: result')
+					app.mount(element, false);
 				})
-			app.mount(element, false);
+			
+
 		} else {
 			const app = createSSRApp({ name, render: () => h(Component, props, slots) });
 			app.mount(element, true);

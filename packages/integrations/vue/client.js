@@ -13,13 +13,11 @@ export default (element) =>
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
 		if (client === 'only') {
-			import ('../../../src/modules/ext-vue-prepare.mjs')
+			// n.b. this is from eventual module location...
+			// also, if you should change the path, watch out for browser and
+			// dev environment problems. Clear caches, restart both, or build-preview.
+			import ('../../../prepare/vue-prepare.mjs')
 				.then (prepare => {
-					// console.log ('FROM EST-VUE-PREPARE: preparing...')
-					// console.log ('typeof prepare: ' + typeof prepare)
-					// console.dir(prepare);
-					// console.log ('stringified prepare: ' + JSON.stringify(prepare))
-					// console.log ('prepare: ' + prepare)
 					const createArgs = { h, Component, props, slots };
 					return prepare.default (name, createArgs);
 				})

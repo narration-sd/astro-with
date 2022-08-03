@@ -12,7 +12,13 @@ export default (element) =>
 		for (const [key, value] of Object.entries(slotted)) {
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
+		let createProper
 		if (client === 'only') {
+			createProper = createApp
+		} else {
+			createProper = createSSRApp
+		}
+			
 			// What we are doing here is allowing an appropriate prepare script to create the
 			// app, so that it can add its own adjuncts, typically via app.use(). If this fails,
 			// or if appropriately named no prepare/integration--prepare.mjs script exists on 
@@ -37,7 +43,9 @@ export default (element) =>
 				})
 				.then (prepare => {
 					const createArgs = { h, Component, props, slots };
-					return prepare.default (name, createArgs); // .default because of import()
+					// this is what lets our vuetify elements show
+					props = Object.assign(props, { formatted: true})
+					return prepare.default (name, createProper, createArgs); // .default because of import()
 				})
 				.catch (err => {
 					console.log ('CLIENTJS:prepare failed:' + err.stack)
@@ -51,12 +59,12 @@ export default (element) =>
 					// *todo* condition logging on what kind of error -- not loading, no, normal?
 					console.log('CLIENTJS:failed prepare: ' + err)
 					console.log('CLIENTJS ABOUT TO CREATE OWN ELEMENT')
-					const app = createApp({ name, render: () => h(Component, props, slots) })
+					const app = createProper({ name, render: () => h(Component, props, slots) })
 					console.log ('CLIENTJS ABOUT TO MOUNT OWN ELEMENT: result')
 					app.mount(element, false);
 				})
-		} else {
-			const app = createSSRApp({ name, render: () => h(Component, props, slots) });
-			app.mount(element, true);
-		}
+		// } else {
+		// 	const app = createSSRApp({ name, render: () => h(Component, props, slots) });
+		// 	app.mount(element, true);
+		// }
 	};

@@ -12,6 +12,8 @@ export default (element) =>
 		for (const [key, value] of Object.entries(slotted)) {
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
+		
+		console.log('Running client.js, client mode: ' + client)
 		let createProper
 		if (client === 'only') {
 			createProper = createApp
@@ -37,7 +39,12 @@ export default (element) =>
 			// The good side of how this does work is that build or running under dev run will 
 			// fail on missing the prepare, or if you miss-spell its name, giving a hard warning..
 			
-			import ('../../../prepare/vue-prepare.mjs')
+			import ('../../../prepare/vue-prepare.mjs') // this path will be converted in the built
+				.catch (err => {
+					// may check the err later so as not to try this if unexpected
+					const prepare_file_actual = '../../../prepare/vue-prepare.mjs' // must match, not converted
+					return import (prepare_file_actual)
+				})
 				.catch (err => {
 					throw new Error ('prepare script not present: ' + err)
 				})

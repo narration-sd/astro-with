@@ -42,6 +42,7 @@ export default (element) =>
 			import ('../../../prepare/vue-prepare.mjs') // this path will be converted in the built
 				.catch (err => {
 					// may check the err later so as not to try this if unexpected
+					console.log('using prepare_file_actual')
 					const prepare_file_actual = '../../../prepare/vue-prepare.mjs' // must match, not converted
 					return import (prepare_file_actual)
 				})
@@ -51,8 +52,9 @@ export default (element) =>
 				.then (prepare => {
 					const createArgs = { h, Component, props, slots };
 					// this is what lets our vuetify elements show
+					// *todo* but does this make sense now? Revisit on current vuetiry schemes, paths
 					props = Object.assign(props, { formatted: true})
-					return prepare.default (name, createProper, createArgs); // .default because of import()
+					return prepare.default (createProper, createArgs, name); // .default because of import()
 				})
 				.catch (err => {
 					console.log ('CLIENTJS:prepare failed:' + err.stack)

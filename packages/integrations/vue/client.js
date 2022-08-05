@@ -42,12 +42,12 @@ export default (element) =>
 			import ('../../../prepare/vue-prepare.mjs') // this path will be converted in the built
 				.catch (err => {
 					// may check the err later so as not to try this if unexpected
-					console.log('using prepare_file_actual')
+					console.log('prepare script missed on provided, trying again using local')
 					const prepare_file_actual = '../../../prepare/vue-prepare.mjs' // must match, not converted
 					return import (prepare_file_actual)
 				})
 				.catch (err => {
-					throw new Error ('prepare script not present: ' + err)
+					throw new Error ('prepare script not present, by either means: ' + err)
 				})
 				.then (prepare => {
 					const createArgs = { h, Component, props, slots };

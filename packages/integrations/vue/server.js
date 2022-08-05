@@ -5,7 +5,7 @@ import StaticHtml from './static-html.js';
 function check(Component) {
 	return !!Component['ssrRender'];
 }
-console.log('Running servee.js, pre-render ')
+console.log('Running server.js, pre-render ')
 
 async function renderToStaticMarkup(Component, props, slotted) {
 	console.log('Running servee.js, now in render ')

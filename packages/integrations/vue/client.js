@@ -6,7 +6,7 @@ export default (element) =>
 		delete props['class'];
 		if (!element.hasAttribute('ssr')) return;
 
-		// Expose name on host component for Vue devtools
+		// Expose name on host component for Vue devtools, and prepare...
 		const name = Component.name ? `${Component.name} Host` : undefined;
 		const slots = {};
 		for (const [key, value] of Object.entries(slotted)) {
@@ -38,14 +38,15 @@ export default (element) =>
 			//
 			// The good side of how this does work is that build or running under dev run will 
 			// fail on missing the prepare, or if you miss-spell its name, giving a hard warning..
-			
+
+			// n.b. this folder offset differs between client.js and server.js; different calling points
 			import ('../../../prepare/vue-prepare.mjs') // this path will be converted in the built
-				.catch (err => {
-					// may check the err later so as not to try this if unexpected
-					console.log('prepare script missed on provided, trying again using local')
-					const prepare_file_actual = '../../../prepare/vue-prepare.mjs' // must match, not converted
-					return import (prepare_file_actual)
-				})
+				// .catch (err => {
+				// 	// may check the err later so as not to try this if unexpected
+				// 	console.log('prepare script missed on provided, trying again using local')
+				// 	const prepare_file_actual = '../../../prepare/vue-prepare.mjs' // must match, not converted
+				// 	return import (prepare_file_actual)
+				// })
 				.catch (err => {
 					throw new Error ('prepare script not present, by either means: ' + err)
 				})
@@ -56,10 +57,10 @@ export default (element) =>
 					props = Object.assign(props, { formatted: true})
 					return prepare.default (createProper, createArgs, name); // .default because of import()
 				})
-				.catch (err => {
-					console.log ('CLIENTJS:prepare failed:' + err.stack)
-					throw err;
-				})
+				// .catch (err => {
+				// 	console.log ('CLIENTJS:prepare failed:' + err.stack)
+				// 	throw err;
+				// })
 				.then (app => {
 					console.log ('CLIENTJS ABOUT TO MOUNT PREPARE-BASED ELEMENT: ' + name)
 					app.mount(element, false);
@@ -67,7 +68,7 @@ export default (element) =>
 				.catch (err => {
 					// *todo* condition logging on what kind of error -- not loading, no, normal?
 					console.log('CLIENTJS:failed prepare: ' + err)
-					console.log('CLIENTJS ABOUT TO CREATE OWN ELEMENT')
+					console.log('CLIENTJS ABOUT TO CREATE OWN ELEMENT for: ' + name)
 					const app = createProper({ name, render: () => h(Component, props, slots) })
 					console.log ('CLIENTJS ABOUT TO MOUNT OWN ELEMENT: result')
 					app.mount(element, false);

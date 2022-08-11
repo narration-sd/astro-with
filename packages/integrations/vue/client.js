@@ -5,6 +5,9 @@ export default (element) =>
 	(Component, props, slotted, { client }) => {
 		delete props['class'];
 		if (!element.hasAttribute('ssr')) return;
+		
+		// a temporary silencer
+		console.log = function(){}
 
 		// Expose name on host component for Vue devtools, and prepare...
 		const name = Component.name ? `${Component.name} Host` : undefined;

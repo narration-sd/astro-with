@@ -28,11 +28,11 @@ The `astro add` command-line tool automates the installation for you. Run one of
    
 ```sh
 # Using NPM
-npx astro add image
+npm run astro add image
 # Using Yarn
 yarn astro add image
 # Using PNPM
-pnpx astro add image
+pnpm astro add image
 ```
   
 Then, restart the dev server by typing `CTRL-C` and then `npm run astro dev` in the terminal window that was running Astro.
@@ -244,7 +244,7 @@ This is the helper function used by the `<Image />` component to build `<img />`
 
 This helper takes in an object with the same properties as the `<Image />` component and returns an object with attributes that should be included on the final `<img />` element.
 
-This can helpful if you need to add preload links to a page's `<head>`.
+This can be helpful if you need to add preload links to a page's `<head>`.
 
 ```astro
 ---
@@ -268,7 +268,7 @@ This helper takes in an object with the same properties as the `<Picture />` com
 
 ## Configuration
 
-The intergration can be configured to run with a different image service, either a hosted image service or a full image transformer that runs locally in your build or SSR deployment.
+The integration can be configured to run with a different image service, either a hosted image service or a full image transformer that runs locally in your build or SSR deployment.
 
 > During development, local images may not have been published yet and would not be available to hosted image services. Local images will always use the built-in `sharp` service when using `astro dev`.
 

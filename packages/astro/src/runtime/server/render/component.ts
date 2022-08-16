@@ -6,7 +6,12 @@ import { extractDirectives, generateHydrateScript } from '../hydration.js';
 import { serializeProps } from '../serialize.js';
 import { shorthash } from '../shorthash.js';
 import { renderSlot } from './any.js';
-import { renderAstroComponent, renderTemplate, renderToIterable } from './astro.js';
+import {
+	isAstroComponentFactory,
+	renderAstroComponent,
+	renderTemplate,
+	renderToIterable,
+} from './astro.js';
 import { Fragment, Renderer } from './common.js';
 import { componentIsHTMLElement, renderHTMLElement } from './dom.js';
 import { formatList, internalSpreadAttributes, renderElement, voidElementNames } from './util.js';
@@ -37,7 +42,7 @@ function getComponentType(Component: unknown): ComponentType {
 	if (Component && typeof Component === 'object' && (Component as any)['astro:html']) {
 		return 'html';
 	}
-	if (Component && (Component as any).isAstroComponentFactory) {
+	if (isAstroComponentFactory(Component)) {
 		return 'astro-factory';
 	}
 	return 'unknown';
@@ -102,6 +107,7 @@ export async function renderComponent(
 
 	const { hydration, isPage, props } = extractDirectives(_props);
 	let html = '';
+	let attrs: Record<string, string> | undefined = undefined;
 
 	if (hydration) {
 		metadata.hydrate = hydration.directive as AstroComponentMetadata['hydrate'];
@@ -222,7 +228,7 @@ Did you mean to enable ${formatList(probableRendererNames.map((r) => '`' + r + '
 				// We already know that renderer.ssr.check() has failed
 				// but this will throw a much more descriptive error!
 				renderer = matchingRenderers[0];
-				({ html } = await renderer.ssr.renderToStaticMarkup.call(
+				({ html, attrs } = await renderer.ssr.renderToStaticMarkup.call(
 					{ result },
 					Component,
 					props,
@@ -247,7 +253,7 @@ If you're still stuck, please open an issue on GitHub or join us at https://astr
 		if (metadata.hydrate === 'only') {
 			html = await renderSlot(result, slots?.fallback);
 		} else {
-			({ html } = await renderer.ssr.renderToStaticMarkup.call(
+			({ html, attrs } = await renderer.ssr.renderToStaticMarkup.call(
 				{ result },
 				Component,
 				props,
@@ -302,7 +308,7 @@ If you're still stuck, please open an issue on GitHub or join us at https://astr
 	);
 
 	const island = await generateHydrateScript(
-		{ renderer: renderer!, result, astroId, props },
+		{ renderer: renderer!, result, astroId, props, attrs },
 		metadata as Required<AstroComponentMetadata>
 	);
 

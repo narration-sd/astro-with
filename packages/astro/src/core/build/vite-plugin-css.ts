@@ -147,8 +147,8 @@ export function rollupPluginAstroBuildCSS(options: PluginOptions): VitePlugin[] 
 								if (options.target === 'client') {
 									if (Object.keys(c.modules).every((id) => internals.cssChunkModuleIds.has(id))) {
 										for (const importedCssImport of meta.importedCss) {
-											delete bundle[importedCssImport];
-											meta.importedCss.delete(importedCssImport);
+											// delete bundle[importedCssImport];
+											// meta.importedCss.delete(importedCssImport);
 										}
 										return;
 									}

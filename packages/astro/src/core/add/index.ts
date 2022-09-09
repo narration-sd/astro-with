@@ -66,29 +66,29 @@ export default async function add(names: string[], { cwd, flags, logging, teleme
 					['--yes', 'Accept all prompts.'],
 					['--help', 'Show this help message.'],
 				],
-				'Recommended: UI Frameworks': [
+				'UI Frameworks': [
 					['react', 'astro add react'],
 					['preact', 'astro add preact'],
 					['vue', 'astro add vue'],
 					['svelte', 'astro add svelte'],
 					['solid-js', 'astro add solid-js'],
 					['lit', 'astro add lit'],
+					['alpine', 'astro add alpine'],
 				],
-				'Recommended: Hosting': [
+				'SSR Adapters': [
 					['netlify', 'astro add netlify'],
 					['vercel', 'astro add vercel'],
-					['cloudflare', 'astro add cloudflare'],
 					['deno', 'astro add deno'],
+					['cloudflare', 'astro add cloudflare'],
+					['node', 'astro add node'],
 				],
-				'Recommended: Integrations': [
+				Others: [
 					['tailwind', 'astro add tailwind'],
+					['image', 'astro add image'],
+					['mdx', 'astro add mdx'],
 					['partytown', 'astro add partytown'],
 					['sitemap', 'astro add sitemap'],
-				],
-				'Example: Add an SSR Adapter': [
-					['netlify', 'astro add netlify'],
-					['vercel', 'astro add vercel'],
-					['deno', 'astro add deno'],
+					['prefetch', 'astro add prefetch'],
 				],
 			},
 			description: `For more integrations, check out: ${cyan('https://astro.build/integrations')}`,
@@ -551,11 +551,11 @@ async function getInstallIntegrationsCommand({
 
 	switch (pm.name) {
 		case 'npm':
-			return { pm: 'npm', command: 'install', flags: ['--save-dev'], dependencies };
+			return { pm: 'npm', command: 'install', flags: [], dependencies };
 		case 'yarn':
-			return { pm: 'yarn', command: 'add', flags: ['--dev'], dependencies };
+			return { pm: 'yarn', command: 'add', flags: [], dependencies };
 		case 'pnpm':
-			return { pm: 'pnpm', command: 'install', flags: ['--save-dev'], dependencies };
+			return { pm: 'pnpm', command: 'install', flags: [], dependencies };
 		default:
 			return null;
 	}
@@ -577,9 +577,10 @@ async function tryToInstallIntegrations({
 	if (installCommand === null) {
 		return UpdateResult.none;
 	} else {
-		const coloredOutput = `${bold(installCommand.pm)} ${
-			installCommand.command
-		} ${installCommand.flags.join(' ')} ${cyan(installCommand.dependencies.join(' '))}`;
+		const coloredOutput = `${bold(installCommand.pm)} ${installCommand.command}${[
+			'',
+			...installCommand.flags,
+		].join(' ')} ${cyan(installCommand.dependencies.join(' '))}`;
 		const message = `\n${boxen(coloredOutput, {
 			margin: 0.5,
 			padding: 0.5,

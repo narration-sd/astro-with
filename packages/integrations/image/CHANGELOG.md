@@ -1,5 +1,44 @@
 # @astrojs/image
 
+## 0.6.0
+
+### Minor Changes
+
+- [#4642](https://github.com/withastro/astro/pull/4642) [`e4348a4eb`](https://github.com/withastro/astro/commit/e4348a4eb49466579204eb5f7fb8823736f467c0) Thanks [@beeb](https://github.com/beeb)! - Added a `background` option to specify a background color to replace transparent pixels (alpha layer).
+
+### Patch Changes
+
+- [#4649](https://github.com/withastro/astro/pull/4649) [`db70afdcd`](https://github.com/withastro/astro/commit/db70afdcd5b7d6b39c9953e88dbdadc5e3a93175) Thanks [@tony-sull](https://github.com/tony-sull)! - Fixes a bug related to filenames for remote images in SSG builds
+
+## 0.5.1
+
+### Patch Changes
+
+- [#4626](https://github.com/withastro/astro/pull/4626) [`494c2b835`](https://github.com/withastro/astro/commit/494c2b8353d1975d840c5acaf70cb513b99c58e5) Thanks [@altano](https://github.com/altano)! - Parallelize image transforms
+
+## 0.5.0
+
+### Minor Changes
+
+- [#4511](https://github.com/withastro/astro/pull/4511) [`72c760e9b`](https://github.com/withastro/astro/commit/72c760e9b8e70dc4c8d4cc08f453d58a8928a0ee) Thanks [@DerYeger](https://github.com/DerYeger)! - feat: throw if alt text is missing
+
+### Patch Changes
+
+- [#4593](https://github.com/withastro/astro/pull/4593) [`56f83be92`](https://github.com/withastro/astro/commit/56f83be92a6417bb1cbb88dd58c3dcaf5177b9b6) Thanks [@tony-sull](https://github.com/tony-sull)! - Fixes a bug that broke support for local images with spaces in the filename
+
+## 0.4.0
+
+### Minor Changes
+
+- [#4482](https://github.com/withastro/astro/pull/4482) [`00c605ce3`](https://github.com/withastro/astro/commit/00c605ce350be83a07c5855f7b99ee41eee1ee38) Thanks [@tony-sull](https://github.com/tony-sull)! - `<Image />` and `<Picture />` now support using images in the `/public` directory :tada:
+
+  - Moving handling of local image files into the Vite plugin
+  - Optimized image files are now built to `/dist` with hashes provided by Vite, removing the need for a `/dist/_image` directory
+  - Removes three npm dependencies: `etag`, `slash`, and `tiny-glob`
+  - Replaces `mrmime` with the `mime` package already used by Astro's SSR server
+  - Simplifies the injected `_image` route to work for both `dev` and `build`
+  - Adds a new test suite for using images with `@astrojs/mdx` - including optimizing images straight from `/public`
+
 ## 0.3.7
 
 ### Patch Changes

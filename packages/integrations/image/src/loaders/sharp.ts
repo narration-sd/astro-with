@@ -1,11 +1,11 @@
 import sharp from 'sharp';
-import { isAspectRatioString, isOutputFormat } from '../utils/images.js';
+import { isAspectRatioString, isColor, isOutputFormat } from '../loaders/index.js';
 import type { OutputFormat, SSRImageService, TransformOptions } from './index.js';
 
 class SharpService implements SSRImageService {
 	async getImageAttributes(transform: TransformOptions) {
 		// strip off the known attributes
-		const { width, height, src, format, quality, aspectRatio, ...rest } = transform;
+		const { width, height, src, format, quality, aspectRatio, background, ...rest } = transform;
 
 		return {
 			...rest,
@@ -37,16 +37,14 @@ class SharpService implements SSRImageService {
 			searchParams.append('ar', transform.aspectRatio.toString());
 		}
 
-		searchParams.append('href', transform.src);
+		if (transform.background) {
+			searchParams.append('bg', transform.background);
+		}
 
 		return { searchParams };
 	}
 
 	parseTransform(searchParams: URLSearchParams) {
-		if (!searchParams.has('href')) {
-			return undefined;
-		}
-
 		let transform: TransformOptions = { src: searchParams.get('href')! };
 
 		if (searchParams.has('q')) {
@@ -78,6 +76,13 @@ class SharpService implements SSRImageService {
 			}
 		}
 
+		if (searchParams.has('bg')) {
+			const background = searchParams.get('bg')!;
+			if (isColor(background)) {
+				transform.background = background;
+			}
+		}
+
 		return transform;
 	}
 
@@ -93,6 +98,11 @@ class SharpService implements SSRImageService {
 			sharpImage.resize(width, height);
 		}
 
+		// remove alpha channel and replace with background color if requested
+		if (transform.background) {
+			sharpImage.flatten({ background: transform.background });
+		}
+
 		if (transform.format) {
 			sharpImage.toFormat(transform.format, { quality: transform.quality });
 		}
@@ -106,6 +116,6 @@ class SharpService implements SSRImageService {
 	}
 }
 
-const service = new SharpService();
+const service: SSRImageService = new SharpService();
 
 export default service;

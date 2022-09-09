@@ -1,8 +1,7 @@
 /// <reference types="astro/astro-jsx" />
-import { lookup } from 'mrmime';
+import mime from 'mime';
 import { extname } from 'node:path';
-import { OutputFormat, TransformOptions } from '../loaders/index.js';
-import { parseAspectRatio } from '../utils/images.js';
+import { OutputFormat, parseAspectRatio, TransformOptions } from '../loaders/index.js';
 import { ImageMetadata } from '../vite-plugin-astro-image.js';
 import { getImage } from './get-image.js';
 
@@ -11,6 +10,7 @@ export interface GetPictureParams {
 	widths: number[];
 	formats: OutputFormat[];
 	aspectRatio?: TransformOptions['aspectRatio'];
+	background?: TransformOptions['background'];
 }
 
 export interface GetPictureResult {
@@ -37,7 +37,7 @@ async function resolveFormats({ src, formats }: GetPictureParams) {
 		unique.add(extname(metadata.src).replace('.', '') as OutputFormat);
 	}
 
-	return [...unique];
+	return Array.from(unique).filter(Boolean);
 }
 
 export async function getPicture(params: GetPictureParams): Promise<GetPictureResult> {
@@ -65,13 +65,14 @@ export async function getPicture(params: GetPictureParams): Promise<GetPictureRe
 					format,
 					width,
 					height: Math.round(width / aspectRatio!),
+					background: params.background,
 				});
 				return `${img.src} ${width}w`;
 			})
 		);
 
 		return {
-			type: lookup(format) || format,
+			type: mime.getType(format) || format,
 			srcset: imgs.join(','),
 		};
 	}
@@ -84,6 +85,7 @@ export async function getPicture(params: GetPictureParams): Promise<GetPictureRe
 		width: Math.max(...widths),
 		aspectRatio,
 		format: allFormats[allFormats.length - 1],
+		background: params.background,
 	});
 
 	const sources = await Promise.all(allFormats.map((format) => getSource(format)));

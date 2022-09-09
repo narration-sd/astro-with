@@ -17,7 +17,7 @@
 // fail on missing the prepare, or if you miss-spell its name, giving a hard warning..
 
 // n.b. this folder offset differs between client.js and server.js; different calling points
-import {h} from "vue";
+import { h } from "vue";
 
 const doPrepare = (Component, props, slots, createProper, name) => {
 	

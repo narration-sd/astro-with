@@ -8,7 +8,7 @@ export default (element) =>
 		if (!element.hasAttribute('ssr')) return;
 		
 		// a temporary silencer
-		console.log = function(){}
+		// console.log = function(){}
 
 		// Expose name on host component for Vue devtools, and prepare...
 		const name = Component.name ? `${Component.name} Host` : undefined;
@@ -20,8 +20,8 @@ export default (element) =>
 		const createProper = client === 'only'
 		  ? createApp
 			: createSSRApp
-		
-		doPrepare(Component, props, slots, createProper, name)
+		console.log ('HERE:ClientJs:client: ' + client)
+		doPrepare(Component, props, slots, createProper, name, client === 'only')
 			.then (app => {
 				app.mount (element)
 			})

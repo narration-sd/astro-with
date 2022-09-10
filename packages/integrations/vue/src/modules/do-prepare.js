@@ -19,7 +19,7 @@
 // n.b. this folder offset differs between client.js and server.js; different calling points
 import { h } from "vue";
 
-const doPrepare = (Component, props, slots, createProper, name) => {
+const doPrepare = (Component, props, slots, createProper, name = 'not named', isClient = true) => {
 	
 	// This is the means that binds client-side prepare scripting to Astro 
 	// server use, whether it is in the upload prepared for the client,
@@ -42,7 +42,7 @@ const doPrepare = (Component, props, slots, createProper, name) => {
 			// this is what lets our vuetify elements show
 			// *todo* but does this make sense now? Revisit on current vuetiry schemes, paths
 			// props = Object.assign(props, { formatted: true})
-			return prepare.default (createProper, createArgs, name); // .default because of import()
+			return prepare.default (createProper, createArgs, name, isClient); // .default because of import()
 		})
 		// .catch (err => {
 		// 	console.log ('CLIENTJS:prepare failed:' + err.stack)

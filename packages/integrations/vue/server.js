@@ -16,7 +16,7 @@ async function renderToStaticMarkup(Component, props, slotted) {
 		slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 	}
 
-	return doPrepare(Component, props, slots, createSSRApp, name)
+	return doPrepare(Component, props, slots, createSSRApp, name, true)
 		.then (async app => {
 
 			console.log('SERVERJS ready to render app...' + app)

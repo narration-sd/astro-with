@@ -4,7 +4,7 @@ import StaticHtml from './static-html.js';
 import { doPrepare } from "./src/modules/do-prepare.js";
 
 function check(Component) {
-	return !!Component['ssrRender'];
+	return !!Component['ssrRender'] || !!Component['__ssrInlineRender'];
 }
 
 async function renderToStaticMarkup(Component, props, slotted) {

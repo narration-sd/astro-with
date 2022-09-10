@@ -20,8 +20,8 @@ export default (element) =>
 		const createProper = client === 'only'
 		  ? createApp
 			: createSSRApp
-		console.log ('HERE:ClientJs:client: ' + client)
-		doPrepare(Component, props, slots, createProper, name, client === 'only')
+		console.log ('CLIENTJS:HERE:ClientJs:client: ' + client)
+		doPrepare(Component, props, slots, createProper, name, true)
 			.then (app => {
 				app.mount (element)
 			})

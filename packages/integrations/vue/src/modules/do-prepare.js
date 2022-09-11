@@ -28,8 +28,9 @@ const doPrepare = (Component, props, slots, createProper, name = 'not named', is
 	// and to give suitable use experience, as it runs via esbuild, vite, 
 	// and rollup, along the various pathways of dev and build requirements
 	// on library modules, vs. their actual conditions in real life npm.
-	
+
 	return import ('../../../../../prepare/vue-prepare.mjs')
+	// return import ('../../../../../prepare/do-prepare.mjs')
 		// this path will be converted in the built, but requires our monitoring,
 		// as many possible errors will not get as far as execution of this promise.
 		// It's required that the path be hard-coded, or the build system won't notice
@@ -43,6 +44,7 @@ const doPrepare = (Component, props, slots, createProper, name = 'not named', is
 			// *todo* but does this make sense now? Revisit on current vuetiry schemes, paths
 			// props = Object.assign(props, { formatted: true})
 			return prepare.default (createProper, createArgs, name, isClient); // .default because of import()
+			// return prepare.default ('vue', createProper, createArgs, name, isClient); // .default because of import()
 		})
 		// .catch (err => {
 		// 	console.log ('CLIENTJS:prepare failed:' + err.stack)

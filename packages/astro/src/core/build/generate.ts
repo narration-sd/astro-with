@@ -28,7 +28,7 @@ import { createLinkStylesheetElementSet, createModuleScriptsSet } from '../rende
 import { createRequest } from '../request.js';
 import { matchRoute } from '../routing/match.js';
 import { getOutputFilename } from '../util.js';
-import { getOutFile, getOutFolder } from './common.js';
+import { getOutDirWithinCwd, getOutFile, getOutFolder } from './common.js';
 import { eachPageData, getPageDataByComponent, sortedCSS } from './internal.js';
 import type { PageBuildData, SingleFileBuiltModule, StaticBuildOptions } from './types';
 import { getTimeStat } from './util.js';
@@ -103,7 +103,7 @@ export async function generatePages(opts: StaticBuildOptions, internals: BuildIn
 
 	const ssr = opts.astroConfig.output === 'server';
 	const serverEntry = opts.buildConfig.serverEntry;
-	const outFolder = ssr ? opts.buildConfig.server : opts.astroConfig.outDir;
+	const outFolder = ssr ? opts.buildConfig.server : getOutDirWithinCwd(opts.astroConfig.outDir);
 	const ssrEntryURL = new URL('./' + serverEntry + `?time=${Date.now()}`, outFolder);
 	const ssrEntry = await import(ssrEntryURL.toString());
 	const builtPaths = new Set<string>();
@@ -111,6 +111,7 @@ export async function generatePages(opts: StaticBuildOptions, internals: BuildIn
 	for (const pageData of eachPageData(internals)) {
 		await generatePage(opts, internals, pageData, ssrEntry, builtPaths);
 	}
+
 	info(opts.logging, null, dim(`Completed in ${getTimeStat(timer, performance.now())}.\n`));
 }
 
@@ -370,11 +371,8 @@ async function generatePath(
 			if (typeof hashedFilePath !== 'string') {
 				// If no "astro:scripts/before-hydration.js" script exists in the build,
 				// then we can assume that no before-hydration scripts are needed.
-				// Return this as placeholder, which will be ignored by the browser.
-				// TODO: In the future, we hope to run this entire script through Vite,
-				// removing the need to maintain our own custom Vite-mimic resolve logic.
 				if (specifier === BEFORE_HYDRATION_SCRIPT_ID) {
-					return 'data:text/javascript;charset=utf-8,//[no before-hydration script]';
+					return '';
 				}
 				throw new Error(`Cannot find the built path for ${specifier}`);
 			}

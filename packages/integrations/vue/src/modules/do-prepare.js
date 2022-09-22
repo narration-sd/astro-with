@@ -1,3 +1,11 @@
+// Because the core of the Prepare ability moved here, and then pared down to 
+// least code simplicity, the notes here are far to long and involved.
+// *todo* but we want to give sight of this ability -- then clean notes up!!
+
+// you enter at your peril then, but methods here are simple, just critical, 
+// as there is no slack in the compiling and bundling environment.
+// Which had to be discovered, single paths at each step in the chain.
+
 // What we are doing here is allowing an appropriate prepare script to modify the
 // app, so that it can add its own adjuncts, typically via stages of app.use(). If this fails,
 // or if appropriately named no prepare/integration--prepare.mjs script exists on 
@@ -39,12 +47,7 @@ const doPrepare = (appOnly, name = 'not named', isClient = true) => {
 			throw new Error ('prepare script not present, by either means: ' + err)
 		})
 		.then (prepare => {
-			// const createArgs = { h, Component, props, slots };
-			// this is what lets our vuetify elements show
-			// *todo* but does this make sense now? Revisit on current vuetiry schemes, paths
-			// props = Object.assign(props, { formatted: true})
 			return prepare.default (appOnly, name, isClient); // .default because of import()
-			// return prepare.default (createProper, createArgs, name, isClient); // .default because of import()
 		})
 		.catch (err => {
 			// *todo* condition logging on what kind of error?? -- not loading, no, normal?

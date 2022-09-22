@@ -17,11 +17,15 @@ export default (element) =>
 			slots[key] = () => h(StaticHtml, { value, name: key === 'default' ? undefined : key });
 		}
 		
-		const createProper = client === 'only'
-		  ? createApp
-			: createSSRApp
-		console.log ('CLIENTJS:HERE:ClientJs:client: ' + client)
-		doPrepare(Component, props, slots, createProper, name, true)
+		let appOnly
+		if(client === 'only') {
+			appOnly = createApp({ name, render: () => h(Component, props, slots) })
+		}
+		else {
+			appOnly = createSSRApp({ render: () => h(Component, props, slots) })
+		}
+
+		doPrepare(appOnly, name, true)
 			.then (app => {
 				app.mount (element)
 			})

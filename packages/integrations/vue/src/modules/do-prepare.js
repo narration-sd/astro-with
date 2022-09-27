@@ -44,15 +44,16 @@ const doPrepare = (appOnly, name = 'not named', isClient = true) => {
 		// It's required that the path be hard-coded, or the build system won't notice
 		// its linkage to a real file, and convert with a hashcode, as we require.
 		.catch (err => {
-			throw new Error ('prepare script not present, by either means: ' + err)
+			// this is best means; preserves ability to use app without prepare-ation
+			throw new Error (
+				'app prepare/vue-prepare.mjs script is required for this integration, and not present. \n' +
+				'You\'re likely to get other errors that follow, because of it: ' + err)
 		})
 		.then (prepare => {
 			return prepare.default (appOnly, name, isClient); // .default because of import()
 		})
 		.catch (err => {
-			// *todo* condition logging on what kind of error?? -- not loading, no, normal?
-			// *todo* and in the end, do we want to catch here at all now, or let the `astro` command handleit?
-			console.log(name + ':failed prepare: ' + err)
+			console.log(name + ':Failed Prepare: ' + err)
 			return appOnly
 		})
 }

@@ -15,7 +15,7 @@ import type { z } from 'zod';
 import type { SerializedSSRManifest } from '../core/app/types';
 import type { PageBuildData } from '../core/build/types';
 import type { AstroConfigSchema } from '../core/config';
-import type { ViteConfigWithSSR } from '../core/create-vite';
+import type { AstroCookies } from '../core/cookies';
 import type { AstroComponentFactory, Metadata } from '../runtime/server';
 export type {
 	MarkdownHeading,
@@ -116,6 +116,10 @@ export interface AstroGlobal extends AstroGlobalPartial {
 	 *
 	 * [Astro reference](https://docs.astro.build/en/reference/api-reference/#url)
 	 */
+	/**
+	 * Utility for getting and setting cookies values.
+	 */
+	cookies: AstroCookies;
 	url: URL;
 	/** Parameters passed to a dynamic page generated using [getStaticPaths](https://docs.astro.build/en/reference/api-reference/#getstaticpaths)
 	 *
@@ -421,6 +425,15 @@ export interface AstroUserConfig {
 	 * {
 	 *   base: '/docs'
 	 * }
+	 * ```
+	 *
+	 * When using this option, you should mind that all of your imports will be affected. In this example, all of the imports including static resources and codes should add a prefix `/docs/`.
+	 *
+	 * For example, if you want to use a image in your Astro component, you need to change it from '/someimg.png' into '/docs/someimg.png'.
+	 *
+	 * ```astro
+	 * <!-- <img src="/someimg.png"> is not correct. -->
+	 * <img src="/docs/someimg.png">
 	 * ```
 	 */
 	base?: string;
@@ -1083,6 +1096,7 @@ export interface AstroAdapter {
 type Body = string;
 
 export interface APIContext {
+	cookies: AstroCookies;
 	params: Params;
 	request: Request;
 }
@@ -1155,10 +1169,10 @@ export interface AstroIntegration {
 		'astro:build:ssr'?: (options: { manifest: SerializedSSRManifest }) => void | Promise<void>;
 		'astro:build:start'?: (options: { buildConfig: BuildConfig }) => void | Promise<void>;
 		'astro:build:setup'?: (options: {
-			vite: ViteConfigWithSSR;
+			vite: vite.InlineConfig;
 			pages: Map<string, PageBuildData>;
 			target: 'client' | 'server';
-			updateConfig: (newConfig: ViteConfigWithSSR) => void;
+			updateConfig: (newConfig: vite.InlineConfig) => void;
 		}) => void | Promise<void>;
 		'astro:build:generated'?: (options: { dir: URL }) => void | Promise<void>;
 		'astro:build:done'?: (options: {
@@ -1212,12 +1226,14 @@ export interface SSRMetadata {
 	pathname: string;
 	hasHydrationScript: boolean;
 	hasDirectives: Set<string>;
+	hasRenderedHead: boolean;
 }
 
 export interface SSRResult {
 	styles: Set<SSRElement>;
 	scripts: Set<SSRElement>;
 	links: Set<SSRElement>;
+	cookies: AstroCookies | undefined;
 	createAstro(
 		Astro: AstroGlobalPartial,
 		props: Record<string, any>,

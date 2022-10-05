@@ -21,9 +21,6 @@ import astroScriptsPageSSRPlugin from '../vite-plugin-scripts/page-ssr.js';
 import { createCustomViteLogger } from './errors.js';
 import { resolveDependency } from './util.js';
 
-// note: ssr is still an experimental API hence the type omission from `vite`
-export type ViteConfigWithSSR = vite.InlineConfig & { ssr?: vite.SSROptions };
-
 interface CreateViteOptions {
 	settings: AstroSettings;
 	logging: LogOptions;
@@ -58,12 +55,12 @@ function getSsrNoExternalDeps(projectRoot: URL): string[] {
 
 /** Return a common starting point for all Vite actions */
 export async function createVite(
-	commandConfig: ViteConfigWithSSR,
+	commandConfig: vite.InlineConfig,
 	{ settings, logging, mode }: CreateViteOptions
-): Promise<ViteConfigWithSSR> {
+): Promise<vite.InlineConfig> {
 	const thirdPartyAstroPackages = await getAstroPackages(settings);
 	// Start with the Vite configuration that Astro core needs
-	const commonConfig: ViteConfigWithSSR = {
+	const commonConfig: vite.InlineConfig = {
 		cacheDir: fileURLToPath(new URL('./node_modules/.vite/', settings.config.root)), // using local caches allows Astro to be used in monorepos, etc.
 		clearScreen: false, // we want to control the output, not Vite
 		logLevel: 'warn', // log warnings and errors only
@@ -130,6 +127,10 @@ export async function createVite(
 		},
 		ssr: {
 			noExternal: [...getSsrNoExternalDeps(settings.config.root), ...thirdPartyAstroPackages],
+			// shiki is imported by Code.astro, which is no-externalized (processed by Vite).
+			// However, shiki's deps are in CJS and trips up Vite's dev SSR transform, externalize
+			// shiki to load it with node instead.
+			external: mode === 'dev' ? ['shiki'] : [],
 		},
 	};
 

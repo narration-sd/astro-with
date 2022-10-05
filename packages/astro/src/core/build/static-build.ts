@@ -1,6 +1,7 @@
 import glob from 'fast-glob';
 import fs from 'fs';
 import { bgGreen, bgMagenta, black, dim } from 'kleur/colors';
+import path from 'path';
 import { fileURLToPath } from 'url';
 import * as vite from 'vite';
 import { BuildInternals, createBuildInternals } from '../../core/build/internal.js';
@@ -8,7 +9,6 @@ import { prependForwardSlash } from '../../core/path.js';
 import { emptyDir, isModeServerWithNoAdapter, removeDir } from '../../core/util.js';
 import { runHookBuildSetup } from '../../integrations/index.js';
 import { PAGE_SCRIPT_ID } from '../../vite-plugin-scripts/index.js';
-import type { ViteConfigWithSSR } from '../create-vite';
 import { info } from '../logger/core.js';
 import { getOutDirWithinCwd } from './common.js';
 import { generatePages } from './generate.js';
@@ -113,10 +113,10 @@ async function ssrBuild(opts: StaticBuildOptions, internals: BuildInternals, inp
 	const ssr = settings.config.output === 'server';
 	const out = ssr ? opts.buildConfig.server : getOutDirWithinCwd(settings.config.outDir);
 
-	const viteBuildConfig: ViteConfigWithSSR = {
+	const viteBuildConfig: vite.InlineConfig = {
 		...viteConfig,
+		mode: viteConfig.mode || 'production',
 		logLevel: opts.viteConfig.logLevel ?? 'error',
-		mode: 'production',
 		build: {
 			target: 'esnext',
 			...viteConfig.build,
@@ -191,10 +191,10 @@ async function clientBuild(
 
 	info(opts.logging, null, `\n${bgGreen(black(' building client '))}`);
 
-	const viteBuildConfig = {
+	const viteBuildConfig: vite.InlineConfig = {
 		...viteConfig,
+		mode: viteConfig.mode || 'production',
 		logLevel: 'info',
-		mode: 'production',
 		build: {
 			target: 'esnext',
 			...viteConfig.build,
@@ -225,7 +225,7 @@ async function clientBuild(
 		],
 		envPrefix: 'PUBLIC_',
 		base: settings.config.base,
-	} as ViteConfigWithSSR;
+	};
 
 	await runHookBuildSetup({
 		config: settings.config,
@@ -246,12 +246,34 @@ async function cleanSsrOutput(opts: StaticBuildOptions) {
 	const files = await glob('**/*.mjs', {
 		cwd: fileURLToPath(out),
 	});
-	await Promise.all(
-		files.map(async (filename) => {
-			const url = new URL(filename, out);
-			await fs.promises.rm(url);
-		})
-	);
+	if (files.length) {
+		// Remove all the SSR generated .mjs files
+		await Promise.all(
+			files.map(async (filename) => {
+				const url = new URL(filename, out);
+				await fs.promises.rm(url);
+			})
+		);
+		// Map directories heads from the .mjs files
+		const directories: Set<string> = new Set();
+		files.forEach((i) => {
+			const splitFilePath = i.split(path.sep);
+			// If the path is more than just a .mjs filename itself
+			if (splitFilePath.length > 1) {
+				directories.add(splitFilePath[0]);
+			}
+		});
+		// Attempt to remove only those folders which are empty
+		await Promise.all(
+			Array.from(directories).map(async (filename) => {
+				const url = new URL(filename, out);
+				const folder = await fs.promises.readdir(url);
+				if (!folder.length) {
+					await fs.promises.rmdir(url, { recursive: true });
+				}
+			})
+		);
+	}
 	// Clean out directly if the outDir is outside of root
 	if (out.toString() !== opts.settings.config.outDir.toString()) {
 		// Copy assets before cleaning directory if outside root

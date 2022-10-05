@@ -1,5 +1,63 @@
 # @astrojs/vercel
 
+## 2.1.0
+
+### Minor Changes
+
+- [#4876](https://github.com/withastro/astro/pull/4876) [`d3091f89e`](https://github.com/withastro/astro/commit/d3091f89e92fcfe1ad48daca74055d54b1c853a3) Thanks [@matthewp](https://github.com/matthewp)! - Adds the Astro.cookies API
+
+  `Astro.cookies` is a new API for manipulating cookies in Astro components and API routes.
+
+  In Astro components, the new `Astro.cookies` object is a map-like object that allows you to get, set, delete, and check for a cookie's existence (`has`):
+
+  ```astro
+  ---
+  type Prefs = {
+    darkMode: boolean;
+  };
+
+  Astro.cookies.set<Prefs>(
+    'prefs',
+    { darkMode: true },
+    {
+      expires: '1 month',
+    }
+  );
+
+  const prefs = Astro.cookies.get<Prefs>('prefs').json();
+  ---
+
+  <body data-theme={prefs.darkMode ? 'dark' : 'light'}></body>
+  ```
+
+  Once you've set a cookie with Astro.cookies it will automatically be included in the outgoing response.
+
+  This API is also available with the same functionality in API routes:
+
+  ```js
+  export function post({ cookies }) {
+    cookies.set('loggedIn', false);
+
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: '/login',
+      },
+    });
+  }
+  ```
+
+  See [the RFC](https://github.com/withastro/rfcs/blob/main/proposals/0025-cookie-management.md) to learn more.
+
+## 2.0.1
+
+### Patch Changes
+
+- [#4884](https://github.com/withastro/astro/pull/4884) [`fb91d04a5`](https://github.com/withastro/astro/commit/fb91d04a5cb8f84f5b1be0a4e0c6cd61ec514736) Thanks [@bluwy](https://github.com/bluwy)! - Set SSR target webworker
+
+- Updated dependencies [[`5e4c5252b`](https://github.com/withastro/astro/commit/5e4c5252bd80cbaf6a7ee4d4503ece007664410f)]:
+  - @astrojs/webapi@1.1.0
+
 ## 2.0.0
 
 ### Major Changes

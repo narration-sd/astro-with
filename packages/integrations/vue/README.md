@@ -59,7 +59,15 @@ To use your first Vue component in Astro, head to our [UI framework documentatio
 - 💧 client-side hydration options, and
 - 🤝 opportunities to mix and nest frameworks together
 
-Also check our [Astro Integration Documentation][astro-integration] for more on integrations.
+## Troubleshooting
+
+For help, check out the `#support` channel on [Discord](https://astro.build/chat). Our friendly Support Squad members are here to help!
+
+You can also check our [Astro Integration Documentation][astro-integration] for more on integrations.
+
+## Contributing
+
+This package is maintained by Astro's Core team. You're welcome to submit an issue or PR!
 
 [astro-integration]: https://docs.astro.build/en/guides/integrations-guide/
 [astro-ui-frameworks]: https://docs.astro.build/en/core-concepts/framework-components/#using-framework-components
@@ -85,4 +93,41 @@ export default {
     // ...
   })],
 }
+```
+
+### jsx
+
+You can use Vue JSX by setting `jsx: true`.
+
+__`astro.config.mjs`__
+
+```js
+import { defineConfig } from 'astro/config';
+import vue from '@astrojs/vue';
+
+export default defineConfig({
+  integrations: [
+    vue({ jsx: true })
+  ],
+});
+```
+
+This will enable rendering for both Vue and Vue JSX components. To customize the Vue JSX compiler, pass an options object instead of a boolean. See the `@vitejs/plugin-vue-jsx` [docs](https://github.com/vitejs/vite/tree/main/packages/plugin-vue-jsx) for more details.
+
+__`astro.config.mjs`__
+
+```js
+import { defineConfig } from 'astro/config';
+import vue from '@astrojs/vue';
+
+export default defineConfig({
+  integrations: [
+    vue({
+      jsx: {
+        // treat any tag that starts with ion- as custom elements
+        isCustomElement: tag => tag.startsWith('ion-')
+      }
+    })
+  ],
+});
 ```

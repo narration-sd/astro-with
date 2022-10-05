@@ -453,6 +453,25 @@ export default {
 }
 ```
 
+### config.cacheDir
+
+During static builds, the integration will cache transformed images to avoid rebuilding the same image for every build. This can be particularly helpful if you are using a hosting service that allows you to cache build assets for future deployments.
+
+Local images will be cached for 1 year and invalidated when the original image file is changed. Remote images will be cached based on the `fetch()` response's cache headers, similar to how a CDN would manage the cache.
+
+By default, transformed images will be cached to `./node_modules/.astro/image`. This can be configured in the integration's config options.
+
+```js
+export default defineConfig({
+	integrations: [image({
+    // may be useful if your hosting provider allows caching between CI builds
+    cacheDir: "./.cache/image"
+  })]
+});
+```
+
+Caching can also be disabled by using `cacheDir: false`.
+
 ## Examples
 
 ### Local images
@@ -551,7 +570,7 @@ const imageUrl = 'https://www.google.com/images/branding/googlelogo/2x/googlelog
 - If you edit and save a file and don't see your site update accordingly, try refreshing the page.
 - If refreshing the page doesn't update your preview, or if a new installation doesn't seem to be working, then restart the dev server.
 
-For help, check out the `#support-threads` channel on [Discord](https://astro.build/chat). Our friendly Support Squad members are here to help!
+For help, check out the `#support` channel on [Discord](https://astro.build/chat). Our friendly Support Squad members are here to help!
 
 You can also check our [Astro Integration Documentation][astro-integration] for more on integrations.
 

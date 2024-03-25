@@ -1,17 +1,10 @@
 {
-  "name": "astro",
+  "name": "@narration-sd/vtelide",
   "version": "4.5.9",
-  "description": "Astro is a modern site builder with web best practices, performance, and DX front-of-mind.",
+  "description": "Vtelide temporary only for test",
   "type": "module",
-  "author": "withastro",
+  "author": "narration-sd",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/withastro/astro.git",
-    "directory": "packages/astro"
-  },
-  "bugs": "https://github.com/withastro/astro/issues",
-  "homepage": "https://astro.build",
   "types": "./index.d.ts",
   "typesVersions": {
     "*": {

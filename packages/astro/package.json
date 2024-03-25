@@ -5,6 +5,11 @@
   "type": "module",
   "author": "narration-sd",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/narration-sd/astro-with.git",
+    "directory": "packages/astro"
+  },
   "types": "./index.d.ts",
   "typesVersions": {
     "*": {

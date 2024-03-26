@@ -1,6 +1,6 @@
 {
   "name": "@narration-sd/vtelide",
-  "version": "4.5.9",
+  "version": "4.5.10",
   "description": "Vtelide temporary only for test",
   "type": "module",
   "author": "narration-sd",
@@ -113,9 +113,6 @@
   },
   "dependencies": {
     "@astrojs/compiler": "^2.7.0",
-    "@astrojs/internal-helpers": "workspace:*",
-    "@astrojs/markdown-remark": "workspace:*",
-    "@astrojs/telemetry": "workspace:*",
     "@babel/core": "^7.24.3",
     "@babel/generator": "^7.23.3",
     "@babel/parser": "^7.23.3",
@@ -206,7 +203,6 @@
     "@types/send": "^0.17.4",
     "@types/unist": "^3.0.2",
     "@types/yargs-parser": "^21.0.3",
-    "astro-scripts": "workspace:*",
     "cheerio": "1.0.0-rc.12",
     "eol": "^0.9.1",
     "memfs": "^4.6.0",
